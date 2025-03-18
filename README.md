@@ -1,10 +1,25 @@
-- 👋 Hi, I’m @harryzzx
-- 👀 I’m interested in ...
-- 🌱 I’m currently learning ...
-- 💞️ I’m looking to collaborate on ...
-- 📫 How to reach me ...
 
-<!---
-harryzzx/harryzzx is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
-You can click the Preview link to take a look at your changes.
---->
+import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
+ 
+type Repo = {
+  name: string
+  stargazers_count: number
+}
+ 
+export const getServerSideProps = (async () => {
+  // Fetch data from external API
+  const res = await fetch('https://api.github.com/repos/vercel/next.js')
+  const repo: Repo = await res.json()
+  // Pass data to the page via props
+  return { props: { repo } }
+}) satisfies GetServerSideProps<{ repo: Repo }>
+ 
+export default function Page({
+  repo,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  return (
+    <main>
+      <p>{repo.stargazers_count}</p>
+    </main>
+  )
+}
