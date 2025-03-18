@@ -1,25 +1,39 @@
+// pages/products.js
+import React from 'react';
 
-import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
- 
-type Repo = {
-  name: string
-  stargazers_count: number
-}
- 
-export const getServerSideProps = (async () => {
-  // Fetch data from external API
-  const res = await fetch('https://api.github.com/repos/vercel/next.js')
-  const repo: Repo = await res.json()
-  // Pass data to the page via props
-  return { props: { repo } }
-}) satisfies GetServerSideProps<{ repo: Repo }>
- 
-export default function Page({
-  repo,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+function Products({ products }) {
   return (
-    <main>
-      <p>{repo.stargazers_count}</p>
-    </main>
-  )
+    <div>
+      <h1>Product List</h1>
+      <ul>
+        {products.map((product) => (
+          <li key={product.id}>
+            {product.name} - ${product.price}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
+
+export async function getServerSideProps() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`); // Use your API URL
+    const products = await res.json();
+
+    return {
+      props: {
+        products,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return {
+      props: {
+        products: [], // Return empty array or handle error appropriately
+      },
+    };
+  }
+}
+
+export default Products;
